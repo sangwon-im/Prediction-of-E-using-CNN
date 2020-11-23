@@ -1,0 +1,5 @@
+mesh.json
+*.png
+*.dat
+__pycache__
+test.py
