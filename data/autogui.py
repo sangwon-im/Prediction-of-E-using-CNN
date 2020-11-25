@@ -87,7 +87,7 @@ def ErrorCheck():
     y2 = 486
     im2 = ImageGrab.grab((x2-2, y2-2, x2+2, y2+2))
     while True:
-        time.sleep(0.03)
+        time.sleep(0.5)
         im1_now = ImageGrab.grab((x1-2, y1-2, x1+2, y1+2))
         im2_now = ImageGrab.grab((x2-2, y2-2, x2+2, y2+2))
         im1_res = ImageChops.difference(im1, im1_now)
