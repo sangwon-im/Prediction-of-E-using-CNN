@@ -1,5 +1,8 @@
 mesh.json
-*.png
-*.dat
+
 __pycache__
 test.py
+data/raw/*
+data/processed/*
+data/GUIimage/*
+temp/*
