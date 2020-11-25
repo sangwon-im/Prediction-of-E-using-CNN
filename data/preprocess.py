@@ -41,7 +41,7 @@ def extract(data):
         void = []
         return (matrix, void, n_elements)
     
-    
+# analysis 에 있는 데이터를 processed numpy array 로 바꾼다
 if __name__ == "__main__":
     ## initialize ##
     # /analysis 폴더에 접근
@@ -81,9 +81,7 @@ if __name__ == "__main__":
         
         # 딕셔너리에 추가
         meshlist[file_num] = mesh_3d.tolist()
-    
-    print(meshlist[1])
-        
+            
     # 딕셔너리를 직렬화 해서 json 에 저장
     with open("processed/mesh.json", "w") as f:
         json.dump(meshlist, f)
