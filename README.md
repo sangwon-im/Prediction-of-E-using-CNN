@@ -1,5 +1,1 @@
-# Thesis
-
-졸업 논문
-
-기공 구조물의 미소 스케일 모델링 및 CNN 을 이용한 물성 예측
+# Prediction-of-E-using-CNN
