@@ -13,7 +13,13 @@ def plot_voxel(voxels, filename):
     ax.voxels(template, facecolors=colors, edgecolor='k')
     ax.set(xlabel='x', ylabel='y', zlabel='z')
     
-    print("ploting time:", time.time()-start)
     # plt.show()
-    plt.savefig(f'processed/mesh_image/{filename}.png')
-    
+    plt.savefig(f'processed/mesh_image/{filename}.png')    
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    temp = np.where(voxels, False, True)
+    ax.voxels(temp, facecolors=colors, edgecolor='k')
+    ax.set(xlabel='x', ylabel='y', zlabel='z')
+    plt.savefig(f'processed/mesh_image/{filename}_pole.png')    
+    print("ploting time:", time.time()-start)
