@@ -49,24 +49,30 @@ def read_fe2hp(file_num):
                 
                 # 있으면 success 로 바꾼다
                 success = True
+                return True
+            
     # 반복문 다 끝나도 success 가 False 면 에러 반환
     if success == False:
         print(f"num: {file_num}, no result file")
+        return False
 
 
 # Digimat 의 dat 파일(mesh 정보) 을 복사해서 반환하는 함수
 # analysis 에 dat 형식으로 그대로 내용 복사
 def meshdat_copy(file_num):
-    src = "C:\MSC.Software\Digimat\working\Analysis1.dat"
-    dst = "raw/analysis/"
-    # print(src)
-    # print(dst)
-    shutil.copy2(src, dst)
-    shutil.move(dst+"Analysis1.dat", dst+f"{file_num}.dat")
+    try:
+        src = "C:\MSC.Software\Digimat\working\Analysis1.dat"
+        dst = "raw/analysis/"
+        # print(src)
+        # print(dst)
+        shutil.copy2(src, dst)
+        shutil.move(dst+"Analysis1.dat", dst+f"{file_num}.dat")
+    except FileNotFoundError:
+        print(f"No dat file on {file_num}")
+        return False
 
 # 해당 영역 +-2px 이미지 변화 감지
 def PixelCheck(x, y):
-    # time.sleep(1)
     im1 = ImageGrab.grab((x-2, y-2, x+2, y+2))
     while True:
         time.sleep(0.03)
@@ -82,7 +88,7 @@ def ErrorCheck():
     x1 = 640
     y1 = 620
     im1 = ImageGrab.grab((x1-2, y1-2, x1+2, y1+2))
-    # result
+    # no error
     x2 = 862
     y2 = 486
     im2 = ImageGrab.grab((x2-2, y2-2, x2+2, y2+2))
@@ -114,7 +120,7 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     resolution = "QHD"
     
     start = time.time()
-    waittime = 0.1
+    waittime = 0.2
     
     # phase2 사이드바
     pyautogui.moveTo(175, 366, waittime)
@@ -200,21 +206,23 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     if resolution == "FHD":
         PixelCheck(815,515)
     elif resolution == "QHD":
-        PixelCheck(815,759)
+        time.sleep(1)
+        PixelCheck(1170,696)
     
     # 148 465 Mesh 사이드바(마우스 우클릭)
-    pyautogui.moveTo(148, 465, waittime)
+    pyautogui.moveTo(148, 463, 1)
     pyautogui.click(button='right')
    
     # 211 530 Mesh export
-    pyautogui.moveTo(211, 530, waittime)
+    pyautogui.moveTo(270, 530, waittime)
     pyautogui.click()
+    
    
     # 737 664 Ok
     if resolution == "FHD":
         pyautogui.moveTo(737, 664, waittime)
     elif resolution == "QHD":
-        pyautogui.moveTo(753, 842, waittime)
+        pyautogui.moveTo(808, 842, 1)
     pyautogui.click()
    
     # 803 567 overwrite OK
@@ -272,15 +280,19 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     # if resolution == "FHD":
     #     check = PixelCheck(703,381)
     jobstart = time.time()
-    
+    count = 0
+    # 3번 이상 연산이 실패하면 처음부터
     while True:
-        check = ErrorCheck()
+        time.sleep(1)
+        count += 1
+        
+        PixelCheck(515, 620)    
+        check = read_fe2hp(num)
 
-        # 에러가 아닌 경우 -> 
         if check == False:
-            break    
-        # 이 경우엔 에러 창을 끄고 다시 진행
-        if check == True:
+            if count >= 3:
+                DigimatControl(num, volFrac, numIncl, aspectR)
+            
             # 에러 창 끄기
             pyautogui.moveTo(640, 760, waittime)
             pyautogui.click()
@@ -295,10 +307,12 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
             elif resolution == "QHD":
                 pyautogui.moveTo(447, 754, waittime)
             pyautogui.click()
-        
+            
+        elif check == True:
+            break
+     
     jobtime = time.time()-jobstart
-    
-    read_fe2hp(num)
+        
     meshdat_copy(num)
     time.sleep(1)
     # 모든 정보 긁어오기 ok 누르기 전에!
@@ -313,8 +327,12 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     time.sleep(0.5)
     
     delete_fesu()
+    delete_mesh()
 
     return jobtime
+
+def delete_mesh():
+    os.remove("C:\MSC.Software\Digimat\working\Analysis1.dat")
 
 def delete_fesu():
     path_dir = "C:\MSC.Software\Digimat\working"
@@ -374,7 +392,7 @@ if __name__ == "__main__":
         aspectR = random.uniform(1,4)
         try:
             jobtime = DigimatControl(i, str(volFrac), str(numIncl), str(aspectR))
-            time.sleep(2)
+            time.sleep(1)
             saveEtc(i, volFrac, numIncl, aspectR, jobtime)
         except ValueError:
             continue
