@@ -117,7 +117,7 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     # solution(create new job) 실행 -> 
     # 대화상자 종료 전에 read_fe2hp -> label 에 저장
     # 대화상자 종료 -> 다시 geometry 생성
-    resolution = "QHD"
+    resolution = "FHD"
     
     start = time.time()
     waittime = 0.2
@@ -204,6 +204,7 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     
     # 메시 진행중 화면(나중에 픽셀 변화 감지)
     if resolution == "FHD":
+        time.sleep(1)
         PixelCheck(815,515)
     elif resolution == "QHD":
         time.sleep(1)
@@ -250,7 +251,7 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     # number of CPUs
     pyautogui.moveTo(620, 494, waittime)
     pyautogui.doubleClick()
-    pyautogui.write("1")
+    pyautogui.write("4")
     
     # Solver Type
     pyautogui.moveTo(620, 563, waittime)
@@ -290,13 +291,17 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
         check = read_fe2hp(num)
 
         if check == False:
-            if count >= 3:
-                DigimatControl(num, volFrac, numIncl, aspectR)
-            
             # 에러 창 끄기
-            pyautogui.moveTo(640, 760, waittime)
+            if resolution == "FHD":
+                pyautogui.moveTo(480, 582, waittime)
+            if resolution == "QHD":
+                pyautogui.moveTo(640, 760, waittime)
             pyautogui.click()
             
+            # 카운트가 3 이상이면 다시 처음부터
+            if count >= 3:
+                DigimatControl(num, volFrac, numIncl, aspectR)
+                
             # 413 654 create new job
             pyautogui.moveTo(413, 660, waittime)
             pyautogui.click()
@@ -318,7 +323,7 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
     # 모든 정보 긁어오기 ok 누르기 전에!
     # 479 633 ok (대화상자 닫음)
     if resolution == "FHD":
-        pyautogui.moveTo(479, 633, waittime)
+        pyautogui.moveTo(480, 715, waittime)
     elif resolution == "QHD":
         pyautogui.moveTo(641, 896, waittime)
     pyautogui.click()
