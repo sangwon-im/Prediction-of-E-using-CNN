@@ -111,13 +111,12 @@ def ErrorCheck():
 
 # raw 에 analysis 와 properties 데이터
 # 파일 리스트 확인하고, 뒷 숫자부터 붙여넣기
-def DigimatControl(num, volFrac, numIncl, aspectR):
+def DigimatControl(num, volFrac, numIncl, aspectR, resolution):
     # GUI 통제해서 
     # geometry 생성 -> mesh 생성 -> mesh 데이터 복사 후 저장 -> 
     # solution(create new job) 실행 -> 
     # 대화상자 종료 전에 read_fe2hp -> label 에 저장
     # 대화상자 종료 -> 다시 geometry 생성
-    resolution = "FHD"
     
     start = time.time()
     waittime = 0.2
@@ -300,7 +299,7 @@ def DigimatControl(num, volFrac, numIncl, aspectR):
             
             # 카운트가 3 이상이면 다시 처음부터
             if count >= 3:
-                DigimatControl(num, volFrac, numIncl, aspectR)
+                DigimatControl(num, volFrac, numIncl, aspectR, resolution)
                 
             # 413 654 create new job
             pyautogui.moveTo(413, 660, waittime)
@@ -362,7 +361,24 @@ def saveEtc(num, volFrac, numIncl, aspectR, jobtime):
 if __name__ == "__main__":
     delete_fesu()
     
-    num_of_data = 10000
+    while True:
+        resolution = input("resolution(fhd or qhd): ")
+        if resolution == "fhd" or resolution == "f":
+            resolution = "FHD"
+            break
+        elif resolution == "qhd" or resolution == "q":
+            resolution = "QHD"
+            break
+        else:
+            continue
+        
+    while True:
+        index_from = int(input("index from:"))
+        index_to = int(input("index to:"))
+        if index_from < index_to:
+            break
+    
+    # num_of_data = 10000
     meshsize = "30"
     
     filelist = preprocess.read_filename("raw/properties/")
@@ -389,14 +405,14 @@ if __name__ == "__main__":
     pyautogui.doubleClick()
     pyautogui.write(meshsize)
         
-    for i in range(1, num_of_data+1):
+    for i in range(index_from, index_to+1):
         if i in nums: continue
         print("i:", i, end="\t")
         volFrac = random.uniform(0.05, 0.2)
         numIncl = random.randint(30, 50)
         aspectR = random.uniform(1,4)
         try:
-            jobtime = DigimatControl(i, str(volFrac), str(numIncl), str(aspectR))
+            jobtime = DigimatControl(i, str(volFrac), str(numIncl), str(aspectR), resolution)
             time.sleep(1)
             saveEtc(i, volFrac, numIncl, aspectR, jobtime)
         except ValueError:
