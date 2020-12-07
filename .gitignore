@@ -1,8 +1,7 @@
-mesh.json
-
 __pycache__
-test.py
-data/raw/*
-data/processed/*
+src/data/raw/*
+src/data/processed/*
 data/GUIimage/*
 temp/*
+.ipynb_checkpoints
+.vscode
